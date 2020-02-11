@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+        th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+<fieldset
+        class="layui-elem-field layui-field-title layui-card layui-card-body">
+    <div class="layui-form  layui-form-pane">
+        <form class="layui-form" action="">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">活动名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="required" lay-reqtext="活动名称不能为空"
+                           autocomplete="off" placeholder="请输入活动名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">活动类型</label>
+                <div class="layui-input-inline">
+                    <select name="type" my:dict="ACTIVITY_TYPE" my-empty="请选择类型"></select>
+                </div>
+            </div>
+
+            <div class="layui-form-item" pane="">
+                <label class="layui-form-label">活动描述</label>
+                <div class="layui-input-block">
+                    <textarea style="min-height: 50px;" placeholder="请输入描述" name="description" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">开始时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="startTime" id="startTime" placeholder="yyyy-MM-dd HH:mm:ss">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">结束时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="endTime" id="endTime" placeholder="yyyy-MM-dd HH:mm:ss">
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-lg" lay-submit=""
+                            lay-filter="add">提交</button>
+                    <button type="reset"
+                            class="layui-btn layui-btn-lg layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script th:replace="back/common/template :: script"></script>
+<script type="text/javascript">
+    layui.use(
+        [ 'form','layer' ],
+        function() {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+
+
+            form.on('submit(add)', function(data) {
+                let index = layer.load(2);
+                $.ajax({
+                    type: "POST",
+                    url: basePath+"/activity/add",
+                    data: JSON.stringify(data.field),
+                    contentType : "application/json",
+                    success: function(data){
+                        layer.close(index);
+                        layer.msg(data.msg);
+                        if(data.code === "0") {
+                            layer.msg("提交成功");
+                            let parentIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(parentIndex);
+                            window.parent.table.reload("dataList");
+                            window.parent.refreshTreeData();
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+                return false;
+            });
+
+        });
+    layui.use('laydate', function(){
+        let laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#startTime', //指定元素
+            type: 'datetime',
+            trigger: 'click'
+        });
+
+        laydate.render({
+            elem: '#endTime', //指定元素
+            type: 'datetime',
+            trigger: 'click'
+        });
+    });
+</script>
+</body>
+</html>

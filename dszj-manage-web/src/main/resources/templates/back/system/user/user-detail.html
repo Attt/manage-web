@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+ <div class="my-detail-page">
+<!--         <div class="my-detail-title">基本信息</div> -->
+        <table class="layui-table my-detail-table">
+            <tbody>
+            <tr>
+                <th width='100px'>用户ID</th>
+                <td th:text="${user.id}"></td>
+                <th width='100px'>用户名</th>
+                <td th:text="${user.username}"></td>
+            </tr>
+            <tr>
+                <th>用户昵称</th>
+                <td th:text="${user.nickname}"></td>
+                <th>用户性别</th>
+                <td th:text="${#dicts.keyValue('USER_SEX', user.sex)}"></td>
+            </tr>
+            <tr>
+                <th>所在部门</th>
+                <td colspan="4" th:text="${user.deptName}"></td>
+            </tr>
+            <tr>
+                <th>手机号码</th>
+                <td th:text="${user.phone}"></td>
+                <th>邮箱</th>
+                <td th:text="${user.email}"></td>
+            </tr>
+             <tr>
+                <th>状态</th>
+                <td colspan="4" th:text="${#dicts.keyValue('STATUS', user.status)}"></td>
+            </tr>
+           
+            <tr>
+                <th>备注</th>
+                <td th:text="${user.remark}" colspan="4"></td>
+            </tr>
+             <tr>
+                <th>创建时间</th>
+                <td th:text="${#dates.format(user.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <th>最后修改</th>
+                <td th:text="${#dates.format(user.updateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+<!--         <div th:replace="back/common/fragment :: log(${user})"></div> -->
+    </div>
+	<script th:replace="back/common/template :: script"></script>
+</body>
+</html>

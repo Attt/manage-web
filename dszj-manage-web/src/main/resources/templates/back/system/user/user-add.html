@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+	<fieldset
+		class="layui-elem-field layui-field-title layui-card layui-card-body">
+		<!-- 		<legend>新增用户</legend> -->
+
+		<div class="layui-form  layui-form-pane">
+			<form class="layui-form" action="">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label required">用户名</label>
+					<div class="layui-input-inline">
+						<input type="text" name="username" lay-verify="required"
+							autocomplete="off" placeholder="请输入用户名" class="layui-input">
+					</div>
+					
+					<label class="layui-form-label required">昵称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="nickname" lay-verify="required"
+							lay-reqtext="昵称不能为空" placeholder="请输入昵称" autocomplete="off"
+							class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					
+					<label class="layui-form-label required">密码</label>
+					<div class="layui-input-block">
+						<input type="password" name="password" lay-verify="required"
+							lay-reqtext="密码不能为空" placeholder="请输入密码" autocomplete="off"
+							class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+
+					<label class="layui-form-label required">部门</label>
+					<div class="layui-input-block">
+						<input type="text" id="deptId" name="deptId" lay-filter="deptId"
+							lay-verify="required" lay-reqtext="部门不能为空" class="layui-input">
+
+					</div>
+
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label required">角色</label>
+					  <div class="layui-input-block" >
+						<input type="checkbox" name="roleId" th:if="${roles!=null}" th:each="role,status:${roles}" th:title="${role.title}" th:value="${role.id}"/>
+				     </div>
+				</div>
+
+				<div class="layui-form-item">
+
+					<label class="layui-form-label required">性别</label>
+					<div class="layui-input-block">
+						<input type="radio" name="sex" value="0" title="男" checked="">
+						<input type="radio" name="sex" value="1" title="女">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label required">手机</label>
+					<div class="layui-input-inline">
+						<input type="tel" name="phone" lay-verify="required"
+							placeholder="请输入手机号码"  lay-reqtext="手机号不能为空" autocomplete="off" class="layui-input">
+					</div>
+
+					<div class="layui-inline">
+						<label class="layui-form-label">邮箱</label>
+						<div class="layui-input-inline">
+							<input type="text" name="email" lay-verify="email"
+								autocomplete="off" placeholder="请输入邮箱" class="layui-input">
+						</div>
+					</div>
+
+				</div>
+
+				<div class="layui-form-item" pane="">
+					<label class="layui-form-label required">状态</label>
+					<div class="layui-input-block">
+						<input type="radio" name="status" value="0" title="启用" checked="">
+						<input type="radio" name="status" value="1" title="禁用">
+					</div>
+				</div>
+
+
+				<div class="layui-form-item" pane="">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<textarea placeholder="请输入内容" name="remark" class="layui-textarea"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn layui-btn-lg" lay-submit=""
+							data-url="/user/add" lay-filter="add">提交</button>
+						<button type="reset"
+							class="layui-btn layui-btn-lg layui-btn-primary">重置</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</fieldset>
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript">
+		layui.use([ 'form', 'layer', 'treeSelect' ], function() {
+			var form = layui.form;
+			var layer = layui.layer;
+			var treeSelect = layui.treeSelect;
+			var $ = layui.$;
+
+			//部门列表
+			treeSelect.render({
+				// 选择器
+				elem : '#deptId',
+				// 数据
+				data : 'dept/getDeptList',
+				// 异步加载方式：get/post，默认get
+				type : 'get',
+				// 占位符
+				placeholder : '请选择部门',
+				// 是否开启搜索功能：true/false，默认false
+				search : false,
+				// 点击回调
+				click : function(data) {
+					$("input[name='deptId']").val(data.current.id);
+				},
+				// 加载完成后的回调函数
+				success : function(data) {
+					//	treeSelect.refresh();
+				}
+			});
+			
+
+			//表单提交
+			form.on('submit(add)', function(data) {
+				
+				var roleIds = new Array();
+				$("input:checkbox[name='roleId']:checked").each(function(i) {
+					roleIds[i] = $(this).val();
+				});
+				data.field.roleIds = roleIds;
+				
+				return formPost("add", data);
+			});
+
+		});
+	</script>
+</body>
+</html>

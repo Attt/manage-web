@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+        th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+    <style>
+        #code{
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div id="code">
+    <input id="hiddenId" type="hidden" th:value="${id}">
+</div>
+<script th:replace="back/common/template :: script"></script>
+<script type="text/javascript">
+    $("#code").qrcode({
+        render: "canvas", //也可以替换为table
+        foreground: "#04cc11",
+        background: "#FFF",
+        text: "http://www.dszj1.cn?id="+ document.getElementById("hiddenId").value
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+ <div class="my-detail-page">
+<!--         <div class="my-detail-title">基本信息</div> -->
+        <table class="layui-table my-detail-table">
+            <tbody>
+            <tr>
+                <th width='100px'>菜单名称</th>
+                <td th:text="${menu.name}"></td>
+                <th width='100px'>菜单标识</th>
+                <td th:text="${menu.label}"></td>
+            </tr>
+            <tr>
+                <th>菜单类型</th>
+                <td th:text="${menu.type}"></td>
+                <th>父级菜单</th>
+                <td th:text="${menu.parentId}"></td>
+            </tr>
+           
+            <tr>
+                <th>URL地址</th>
+                <td th:text="${menu.url}"></td>
+                <th>icon</th>
+                <td th:text="${menu.icon}"></td>
+            </tr>
+            
+             <tr>
+                <th>状态</th>
+                <td colspan="4" th:text="${menu.status==0 ?'启用':'禁用'}"></td>
+            </tr>
+            <tr>
+                <th>排序数字</th>
+                <td th:text="${menu.orderNum}"></td>
+                <th>备注</th>
+                <td th:text="${menu.remark}"></td>
+            </tr>
+            <tr>
+                <th>创建时间</th>
+                <td th:text="${#dates.format(menu.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <th>最后修改</th>
+                <td th:text="${#dates.format(menu.updateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+	<script th:replace="back/common/template :: script"></script>
+</body>
+</html>

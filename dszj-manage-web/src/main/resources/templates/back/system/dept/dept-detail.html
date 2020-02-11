@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+ <div class="my-detail-page">
+        <table class="layui-table my-detail-table">
+            <tbody>
+            <tr>
+                <th width='100px'>部门名称</th>
+                <td th:text="${dept.name}"></td>
+                <th width='100px'>父级父级部门</th>
+                <td th:text="${dept.parentId}"></td>
+            </tr>
+            <tr>
+                <th>排序数字</th>
+                <td th:text="${dept.orderNum}"></td>
+                <th>备注</th>
+                 <td th:text="${dept.remark}"></td>
+            </tr>
+            <tr>
+                <tr>
+                <th>创建时间</th>
+                <td th:text="${dept.createTime}"></td>
+                <th>最后修改</th>
+                <td th:text="${dept.createTime}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+	<script th:replace="back/common/template :: script"></script>
+</body>
+</html>

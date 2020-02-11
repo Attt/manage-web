@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+	<fieldset
+		class="layui-elem-field layui-field-title layui-card layui-card-body">
+		<div class="layui-form  layui-form-pane">
+			<form class="layui-form" action="">
+			    <input type="hidden" name="id" th:value="${menu.id}"/>
+			    
+			    <div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">父级菜单</label>
+						<div class="layui-input-inline">
+							<input type="text" id="parentId" name= "parentId" th:value="${menu.parentId}" lay-filter="parentId" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label required">菜单类型</label>
+						<div class="layui-input-inline">
+							<select name="type" my:dict="MENU_TYPE" my-empty="请选择类型" my-selected="${menu.type}"></select>
+						</div>
+					</div>
+				</div>
+			    
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label required">菜单名称</label>
+						<div class="layui-input-inline">
+							<input type="text" name="name" th:value="${menu.name}" lay-verify="required" lay-reqtext="菜单名称不能为空"	autocomplete="off" placeholder="请输入菜单名称" class="layui-input">
+						</div>
+					</div>	
+					
+					<div class="layui-inline">
+						<label class="layui-form-label">菜单标识</label>
+						<div class="layui-input-inline">
+							<input type="text" name="label" th:value="${menu.label}" lay-verify="label"
+								placeholder="请输入编码" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">URL地址</label>
+						<div class="layui-input-inline">
+							<input type="text" name="url" th:value="${menu.url}"
+								placeholder="请输入URL地址" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">icon</label>
+						<div class="layui-input-inline">
+							<input type="text" name="icon" th:value="${menu.icon}" lay-verify="icon"
+								placeholder="请输入icon" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">状态</label>
+					<div class="layui-input-block">
+						<input type="radio" name="status" value="0" title="启用" th:attr ="checked=${menu.status==0 ?true:false}">
+						<input type="radio" name="status" value="1" title="禁用" th:attr ="checked=${menu.status==1 ?true:false}">
+					</div>
+				</div>
+				
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">排序数字</label>
+						<div class="layui-input-inline">
+							<input type="text" name="orderNum" th:value="${menu.orderNum}" placeholder="请输入排序数字"
+								autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<input type="text" name="remark" th:value="${menu.remark}" lay-verify="remark"
+								placeholder="请输入备注" autocomplete="off" class="layui-input">
+					</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn layui-btn-lg" lay-submit=""
+							lay-filter="edit">提交</button>
+						<button type="button"  class="layui-btn layui-btn-lg layui-btn-primary back">返回</button> 
+
+					</div>
+				</div>
+			</form>
+		</div>
+	</fieldset>
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript">
+		layui.use([ 'form', 'layer','treeSelect' ], function() {
+			var form = layui.form;
+			var layer = layui.layer;
+			var treeSelect= layui.treeSelect;
+			var $ = layui.$;
+			
+			
+			treeSelect.render({
+				// 选择器
+				elem : '#parentId',
+				// 数据
+				data : 'menu/getSelectParentTree',
+				// 异步加载方式：get/post，默认get
+				type : 'get',
+				// 占位符
+				placeholder : '请选择父级菜单',
+				// 是否开启搜索功能：true/false，默认false
+				search : false,
+				// 点击回调
+				click : function(data) {
+					$("input[name='parentId']").val(data.current.id);
+				},
+				// 加载完成后的回调函数
+				success : function(data) {
+					treeSelect.checkNode('parentId', $("input[name='parentId']").val());
+					//	treeSelect.refresh();// 刷新树结构
+				}
+			});
+
+			
+
+			form.on('submit(edit)', function(data) {
+				var index = layer.load(2);
+				$.ajax({
+							type : "POST",
+							url : basePath+"/menu/edit",
+							data : JSON.stringify(data.field),
+							contentType : "application/json",
+							success : function(result) {
+								layer.close(index);
+								if (result.code == "0") {
+									layer.msg("修改成功");
+									var parentIndex = parent.layer.getFrameIndex(window.name);
+									parent.layer.close(parentIndex);
+									window.parent.table.reload("dataList");
+									if(data.field.type!=4){
+										window.parent.refreshTreeData();
+									}
+								} else {
+									layer.msg(result.msg);
+								}
+							}
+						});
+
+				return false;
+			});
+
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="X-UA-Compatible"
+	content="text/html;IE=edge;charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<!-- <title>${pd.SYSNAME}</title> -->
+
+<link rel="shortcut icon" th:href="@{/back/favicon.ico}" type="image/x-icon"/>
+
+<link rel="stylesheet" th:href="@{/back/lib/layui-v2.5.4/css/layui.css}"
+	media="all" />
+<link rel="stylesheet" th:href="@{/back/css/login.css}" />
+</head>
+
+<body class="beg-login-bg">
+	<div class="beg-login-box">
+	    <header>
+		<h1>赚它一个亿管理平台</h1>
+		</header>
+		<div class="beg-login-main">
+			<form class="layui-form" method="post" th:action="@{/login/login}" >
+				<input name="__RequestVerificationToken" type="hidden"
+					value="fkfh8D89BFqTdrE2iiSdG_L781RSRtdWOH411poVUWhxzA5MzI8es07g6KPYQh9Log-xf84pIR2RIAEkOokZL3Ee3UKmX0Jc8bW8jOdhqo81" />
+				<div class="layui-form-item">
+					<label class="beg-login-icon"> <i class="layui-icon">&#xe612;</i>
+					</label> <input id="username" type="text" name="username"
+						lay-verify="username" autocomplete="off" value="admin"
+						placeholder="这里输入登录名" class="layui-input"/>
+				</div>
+				<div class="layui-form-item">
+					<label class="beg-login-icon"> <i class="layui-icon">&#xe642;</i>
+					</label> <input id="password" type="password" name="password"
+						lay-verify="password" autocomplete="off" value="000000"
+						placeholder="这里输入密码" class="layui-input"/>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="beg-pull-left">
+						<img id="codeImg" alt="图片验证码"	 class="very-code"/>
+					</div>
+					<div class="beg-pull-right">
+						<input id="code" type="text" name="code"
+							lay-verify="verfycode" autocomplete="off" placeholder="请输入验证码"
+							value="" class="very-code"/>
+					</div>
+				</div>
+				
+
+				<div class="layui-form-item">
+					<button id="login-btn" class="layui-btn layui-btn-big login-btn ajax-login"
+						lay-filter="login" type="button">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+					<div class="beg-clear"></div>
+				</div>
+			</form>
+		</div>
+		<div class="layui-footer" style="text-align: center;">2018 © 赚它一个亿科技有限公司</div>
+
+	</div>
+
+	<script type="text/javascript"  th:src="@{/back/lib/layui-v2.5.4/layui.js}"></script>
+	 <script type="text/javascript"  th:inline="javascript">
+        var basePath = [[${#request.getContextPath()}]];
+        if(window.top!==window.self){window.top.location=window.location};
+        layui.use(['element','layer'], function () {
+            var $ = layui.jquery;
+            $("#codeImg").attr("src",basePath +"/login/getValidateCode");
+            $(document).on('click', '#codeImg', function () {
+                this.src = this.src.split("?")[0]+"?" + Math.random();
+            });
+            $(document).on('click', '.ajax-login', function (e) {
+                e.preventDefault();
+                var form = $(this).parents("form");
+                var url = form.attr("action");
+                var serializeArray = form.serializeArray();
+                var index = layer.load(3);
+                $.post(url, serializeArray, function (result) {
+                	layer.close(index);
+                    if(result.code == 0){
+                    	var localStorage = window.localStorage;
+                    	var opts = JSON.stringify(result.data);
+            			localStorage.setItem('opts',opts);
+                    	window.location.href = basePath;
+                    }else{
+                    	$('#codeImg').click();
+                    	$("#code").val('');
+                        layer.msg(result.msg)
+                    }
+                	
+                    
+
+                });
+            })
+        });
+     </script>
+</body>
+</html>

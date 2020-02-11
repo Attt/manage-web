@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="back/common/template :: header(~{::title},~{::link},~{::style})"> </head>
+<body>
+
+<!-- 	查询条件开始 -->
+	<div id="query" class="layui-form layui-card layui-card-body layui-form-pane "
+		style="margin-bottom: -15px; padding-bottom: 0;">
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">头像可用</label>
+				<div class="layui-input-block">
+					<div class="layui-input-inline">
+						<input type="text" id="headerNum"   class="layui-input">
+					</div>
+			
+				</div>
+			</div>
+
+			<div class="layui-inline">
+				<label class="layui-form-label">昵称可用</label>
+				<div class="layui-input-block">
+					<input type="text" id="nicknameNum" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+
+			<div class="layui-inline">
+				<button class="layui-btn layui-btn-sm fa fa-search" data-type="query">
+					 查询
+				</button>
+				<button class="layui-btn layui-btn-sm fa fa-undo" data-type="reset">
+					 重置
+				</button>
+			</div>
+		</div>
+	</div>
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+
+		<div class="layui-field-box layui-form">
+				<table id="dataList"  lay-filter="dataList"
+					class="layui-hide layui-table">
+				</table>
+		</div>
+	</fieldset>
+	
+<!-- 	模板开始 -->
+	
+<!-- 	模板结束 -->
+	
+	<script th:replace="back/common/template :: script"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		// 数据列表
+		layui.use([ 'form', 'table', 'layer'],
+						function() {
+							var table = layui.table;
+							window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var $ = layui.$;
+							
+							
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-200',
+								url : basePath+'/record/queryRecordPage', //数据接口
+								even : true,
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+									limit : '10'
+								},
+								where : {},
+								limits : [10,50,100,500,1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								done :function(res, curr, count){
+								  },
+								page : true, //开启分页
+								cols : [[ //表头
+											{
+												field : 'studentId',
+												title : '昵称',
+												align: 'center',
+												width:'10%'
+											}, 
+											{
+												field : 'activityId',
+												title : '活动id',
+												align: 'center',
+												width:'12%'
+											},
+											{
+												field : 'activityName',
+												title : '活动名称',
+												align: 'center',
+												width:'12%'
+											},
+											{
+												field : 'createTime',
+												title : '签到时间',
+												align: 'center',
+												width:'12%'
+											},
+											{
+												field: 'optBtn',
+												title: '操作',
+												align: 'center',
+												fixed:'right',
+												width:'20%',
+												toolbar: '#optBtn'
+											}
+										] ]
+							};
+							checkOptBtn("user-edit","user-detail",tableOptions);
+					    	//渲染表格
+							table.render(tableOptions);
+				});
+	</script>
+</body>
+
+</html>

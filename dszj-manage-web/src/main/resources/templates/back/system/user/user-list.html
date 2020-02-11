@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+<!-- 	查询条件开始 -->
+	<div id="query" class="layui-form layui-card layui-card-body layui-form-pane "
+		style="margin-bottom: -15px; padding-bottom: 0px;">
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">部门</label>
+				<div class="layui-input-block">
+					<div class="layui-input-inline">
+						<input type="text" id="deptId" name="deptId"  class="layui-input">
+					</div>
+			
+				</div>
+			</div>
+
+			<div class="layui-inline">
+				<label class="layui-form-label">昵称</label>
+				<div class="layui-input-block">
+					<input type="text" name="nickname"
+						placeholder="请输入用户昵称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-inline">
+				<label class="layui-form-label">状态</label>
+				<div class="layui-input-block">
+				    <select name="status" my:dict="STATUS" my-empty="请选择"></select>
+				</div>
+			</div>
+
+			<div class="layui-inline">
+				<button class="layui-btn layui-btn-sm fa fa-search" data-type="query">
+					 查询
+				</button>
+				<button class="layui-btn layui-btn-sm fa fa-undo" data-type="reset">
+					 重置
+				</button>
+			</div>
+		</div>
+	</div>
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+
+		<div class="layui-field-box layui-form">
+<!-- 			<div class="layui-form-item"> -->
+<!-- 				<div class="pull-left screen-btn-group"> -->
+<!-- 					<div class="btn-group-left"> -->
+<!-- 						<button class="layui-btn layui-btn-sm" data-type="add"> -->
+<!-- 							<i class="fa fa-plus"> 新增</i>  -->
+<!-- 						</button> -->
+<!-- 						<button class="layui-btn layui-btn-sm layui-btn-danger" data-type="delete"> -->
+<!-- 							<i class="fa fa-minus"> 删除</i>  -->
+<!-- 						</button> -->
+
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+				<table id="dataList"  lay-filter="dataList"
+					class="layui-hide layui-table">
+				</table>
+				
+<!-- 				<p th:text="'调用java的方法: ' + ${#dicts.keyValue('USER_SEX','1')} + '!'"/> -->
+				
+		</div>
+	</fieldset>
+	
+<!-- 	模板开始 -->
+
+	<script type="text/html" id="leftToolBtn">
+		{{showLeftToolBtn("user-add","user-delete")}} 
+	</script>
+	<script type="text/html" id="optBtn">
+		{{showOptBtn("user-edit","user-detail","user-resetPassword")}} 
+	</script>
+	
+	<script type="text/html" id="sexTpl" th:inline="javascript">	
+ 		{{ showDictName("USER_SEX",d.sex) }}       
+	</script>
+	
+	<script type="text/html" id="statusTpl" th:inline="javascript">	
+ 		{{ showDictName("STATUS",d.status) }}       
+	</script>
+	
+<!-- 	模板结束 -->
+	
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript" th:inline="javascript">
+		// 数据列表
+		layui.use([ 'form', 'table', 'layer', 'treeSelect' ],
+						function() {
+							var table = layui.table;window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var treeSelect= layui.treeSelect;
+							var $ = layui.$;
+							
+							treeSelect.render({
+								// 选择器
+								elem : '#deptId',
+								// 数据
+								data : 'dept/getDeptList',
+								// 异步加载方式：get/post，默认get
+								type : 'get',
+								// 占位符
+								placeholder : '请选择部门',
+								// 是否开启搜索功能：true/false，默认false
+								search : false,
+								// 点击回调
+								click : function(data) {
+									 $("input[name='deptId']").val(data.current.id);
+								},
+								// 加载完成后的回调函数
+								success : function(data) {
+									//	treeSelect.refresh();
+								}
+							});
+							
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-200',
+								url : basePath+'/user/getPageList', //数据接口
+// 								headers: {token: 'sasasas'},
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+// 								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+									limit : '10'
+								},
+								where : {},
+								limits : [10,50,100,500,1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								done :function(res, curr, count){
+									
+								  },
+								page : true, //开启分页
+								cols : [[ //表头
+											{
+												type : 'checkbox',
+												width:'3%'
+											}, {
+												field : 'username',
+												title : '用户名',
+												align: 'center',
+												width:'5%',
+												sort : true
+											}, {
+												field : 'nickname',
+												title : '昵称',
+												align: 'center',
+												width:'10%',
+												sort : true
+											}, {
+												field : 'phone',
+												title : '手机号',
+												align: 'center',
+												width:'10%',
+												sort : true
+											},
+											{
+												field : 'email',
+												title : '邮箱',
+												align: 'center',
+												width:'12%',
+												sort : true
+											},
+											{
+												field : 'deptName',
+												title : '部门',
+												align: 'center',
+												width:'10%',
+												sort : true
+											}, {
+												field : 'sex',
+												title : '性别',
+												align: 'center',
+												sort : true,
+												width:'5%',
+												templet: '#sexTpl'
+											},{
+												field : 'status',
+												title : '状态',
+												align: 'center',
+												sort : true,
+												width:'8%',
+												templet: '#statusTpl'
+											}, {
+												field : 'createTime',
+												title : '创建时间',
+												align: 'center',
+												width:'15%',
+												sort : true
+											}
+											,{
+												field: 'optBtn',
+												title: '操作',
+												align: 'center',
+												fixed:'right',
+												width:'20%',
+												toolbar: '#optBtn'
+											}
+										] ]
+							};
+							
+							//渲染菜单按钮
+							checkLeftToolBtn("user-add","user-delete",tableOptions);
+					    	checkOptBtn("user-edit","user-detail",tableOptions);
+					    	//渲染表格
+							table.render(tableOptions);
+							
+
+						
+						//监听toolbar事件
+						table.on('toolbar(dataList)', function(data) {
+							if(data.event === 'user-add'){
+								openWindow(data.event);
+							}
+							if(data.event === 'user-delete'){
+								batchDelete(data.event,table);
+							}
+						
+						});
+						
+						
+						
+// 						监听操作栏tool事件
+						table.on('tool(dataList)', function(data) {
+							if(data.event === 'user-edit' || data.event === 'user-detail'){
+								openWindow(data.event,'id='+data.data.id);
+							}
+							
+							if(data.event === 'user-resetPassword'){
+						    	var button = $("a[lay-event='"+data.event+"']")[0];
+							    var url = $(button).attr("data-url");
+								layer.confirm('您确认要重置密码吗？', function(index) {
+									var index = layer.load(2);
+									$.getJSON(basePath+url, {id: data.data.id}, function(result){
+										layer.close(index);
+										if(result.code == "0") {
+											layer.msg("重置成功");
+											table.reload("dataList");
+										} else {
+											layer.msg(result.msg);
+										}
+									});	
+								});
+							}
+						});
+							
+						
+						//查询和重置事件绑定
+						$(".fa-search,.fa-undo").on('click', function() {
+							var type = $(this).data('type');
+							var where = { 
+									  nickname: $("input[name='nickname']").val(),
+									  status: $("select[name='status']").val(),
+									  deptId: $("input[name='deptId']").val()
+								  };
+							active[type](table,where);
+						});
+
+				});
+		
+		
+		
+	</script>
+
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+	<fieldset
+		class="layui-elem-field layui-field-title layui-card layui-card-body">
+		<div class="layui-form  layui-form-pane">
+			<form class="layui-form" action="">
+			<input type="hidden" name="id" th:if="${role}" th:value="${role.id}"/>
+				<div class="layui-form-item">
+					<label class="layui-form-label required">角色标识</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" lay-reqtext="角色标识不能为空" lay-verify="required" 
+							autocomplete="off" placeholder="请输入角色标识" class="layui-input"  th:value="${role.name}">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label required">角色名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="title" lay-reqtext="角色名称不能为空" lay-verify="required"
+							 placeholder="请输入角色名称" autocomplete="off"
+							class="layui-input" th:value="${role.title}">
+					</div>
+				</div>
+
+				<div class="layui-form-item" pane="">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<textarea placeholder="请输入内容" name="remark" class="layui-textarea">[[${role.remark}]]</textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn layui-btn-lg" lay-submit="" data-url="/role/edit"
+							lay-filter="edit">提交</button>
+						<button type="reset"
+							class="layui-btn layui-btn-lg layui-btn-primary">重置</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</fieldset>
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript">
+		layui.use([ 'form', 'layer' ], function() {
+			var form = layui.form;
+			var layer = layui.layer;
+			var $ = layui.$;
+
+			form.on('submit(edit)', function(data) {
+				return formPost("edit",data);
+			});
+
+		});
+	</script>
+</body>
+</html>

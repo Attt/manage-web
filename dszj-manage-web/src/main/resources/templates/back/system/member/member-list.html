@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+	<style type="text/css">
+		.layui-table-cell {
+			height: 60px;
+			line-height: 60px;
+		}
+
+	</style>
+</head>
+<body>
+
+<!-- 	查询条件开始 -->
+	<div id="query" class="layui-form layui-card layui-card-body layui-form-pane "
+		style="margin-bottom: -15px; padding-bottom: 0px;">
+
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<label class="layui-form-label">头像可用</label>
+				<div class="layui-input-block">
+					<div class="layui-input-inline">
+						<input type="text" id="headerNum"   class="layui-input">
+					</div>
+			
+				</div>
+			</div>
+
+			<div class="layui-inline">
+				<label class="layui-form-label">昵称可用</label>
+				<div class="layui-input-block">
+					<input type="text" id="nicknameNum" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+
+			<div class="layui-inline">
+				<button class="layui-btn layui-btn-sm fa fa-search" data-type="query">
+					 查询
+				</button>
+				<button class="layui-btn layui-btn-sm fa fa-undo" data-type="reset">
+					 重置
+				</button>
+			</div>
+		</div>
+	</div>
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+
+		<div class="layui-field-box layui-form">
+<!-- 			<div class="layui-form-item"> -->
+<!-- 				<div class="pull-left screen-btn-group"> -->
+<!-- 					<div class="btn-group-left"> -->
+<!-- 						<button class="layui-btn layui-btn-sm" data-type="add"> -->
+<!-- 							<i class="fa fa-plus"> 新增</i>  -->
+<!-- 						</button> -->
+<!-- 						<button class="layui-btn layui-btn-sm layui-btn-danger" data-type="delete"> -->
+<!-- 							<i class="fa fa-minus"> 删除</i>  -->
+<!-- 						</button> -->
+
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+				<table id="dataList"  lay-filter="dataList"
+					class="layui-hide layui-table">
+				</table>
+				
+<!-- 				<p th:text="'调用java的方法: ' + ${#dicts.keyValue('USER_SEX','1')} + '!'"/> -->
+				
+		</div>
+	</fieldset>
+	
+<!-- 	模板开始 -->
+
+	<script type="text/html" id="leftToolBtn">
+		{{showLeftToolBtn("member-headerpic","member-nickname")}} 
+
+	</script>
+	<script type="text/html" id="optBtn">
+		{{showOptBtn("user-edit","user-detail","user-resetPassword")}} 
+	</script>
+	
+	<script type="text/html" id="sexTpl" th:inline="javascript">	
+ 		{{ showDictName("USER_SEX",d.sex) }}       
+	</script>
+	
+	<script type="text/html" id="statusTpl" th:inline="javascript">	
+ 		{{ showDictName("STATUS",d.status) }}       
+	</script>
+	<script type="text/html" id="imgTmp" th:inline="javascript">
+		<img src="{{ showPic(d.headerPic) }}" th:height="50px">
+    </script>
+	
+<!-- 	模板结束 -->
+	
+	<script th:replace="back/common/template :: script"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		// 数据列表
+		layui.use([ 'form', 'table', 'layer'],
+						function() {
+							var table = layui.table;window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var $ = layui.$;
+							
+							
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-100',
+								url : basePath+'/member/queryMemberPage', //数据接口
+								even : true,
+// 								headers: {token: 'sasasas'},
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+								},
+								where : {},
+								limit : '1000',
+								limits : [1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								done :function(res, curr, count){
+									$("#headerNum").val(res.errDesc);
+									$("#nicknameNum").val(res.traceId);
+								  },
+								page : true, //开启分页
+								cols : [[ //表头
+								         
+											{
+												type : 'checkbox',
+												width:'3%'
+											}, {
+												type : 'numbers',
+												width:'3%'
+											}, {
+												field : 'nickname',
+												title : '昵称',
+												align: 'center',
+												width:'10%',
+												sort : true
+											}, 
+											{
+												field : 'headerPic',
+												title : '头像',
+												align: 'center',
+												width:'12%',
+												templet:'#imgTmp'
+											}
+											
+										] ]
+							};
+							
+							//渲染菜单按钮
+							checkLeftToolBtn("member-headerpic","member-nickname",tableOptions);
+// 					    	checkOptBtn("user-edit","user-detail",tableOptions);
+					    	//渲染表格
+							table.render(tableOptions);
+							
+
+						
+						//监听toolbar事件
+						table.on('toolbar(dataList)', function(data) {
+							
+							if(data.event === 'member-headerpic'){
+								var checkStatus = table.checkStatus('dataList');
+								var data = checkStatus.data;
+								if (data != null && data.length > 0) {
+									var button = $("a[lay-event='member-headerpic']")[0];
+								    var url = $(button).attr("data-url");
+									layer.confirm('您确认要标记选中【头像】数据吗？', function(index) {
+										var index = layer.load(2);
+										var ids =new Array();
+										$.each(data, function(i, o){
+											 ids.push(o.id);
+										});
+											
+										$.getJSON(basePath+url, {ids: ids.join(',')}, function(result){
+											layer.close(index);
+											if(result.code == "0") {
+												layer.msg("头像标记成功");
+												table.reload("dataList");
+											} else {
+												layer.msg(result.msg);
+											}
+										});	
+									});
+									
+								} else {
+									layer.msg("请选择一条数据");
+								}
+							}
+							
+							if(data.event === 'member-nickname'){
+								var checkStatus = table.checkStatus('dataList');
+								var data = checkStatus.data;
+								if (data != null && data.length > 0) {
+									var button = $("a[lay-event='member-nickname']")[0];
+								    var url = $(button).attr("data-url");
+									layer.confirm('您确认要标记选中【昵称】数据吗？', function(index) {
+										var index = layer.load(2);
+										var ids =new Array();
+										$.each(data, function(i, o){
+											 ids.push(o.id);
+										});
+											
+										$.getJSON(basePath+url, {ids: ids.join(',')}, function(result){
+											layer.close(index);
+											if(result.code == "0") {
+												layer.msg("昵称标记成功");
+												table.reload("dataList");
+											} else {
+												layer.msg(result.msg);
+											}
+										});	
+									});
+									
+								} else {
+									layer.msg("请选择一条数据");
+								}
+							}
+						
+						});
+						
+						
+						//查询和重置事件绑定
+						$(".fa-search,.fa-undo").on('click', function() {
+							var type = $(this).data('type');
+							var where = { 
+								  };
+							active[type](table,where);
+						});
+
+				});
+		
+		
+		
+	</script>
+
+	<script type="text/javascript">
+		 showPic = function (pic) {
+			return (pic.indexOf('http') != -1) ? pic : 'http://www.dszj1.cn'+pic;
+		};
+	</script>
+
+</body>
+
+</html>

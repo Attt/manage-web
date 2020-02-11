@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+<!-- 	查询条件开始 -->
+	<div id="query" class="layui-form layui-card layui-card-body layui-form-pane "
+		style="margin-bottom: -15px; padding-bottom: 0px;">
+
+		<div class="layui-form-item">
+
+			<div class="layui-inline">
+				<label class="layui-form-label">字典标识</label>
+				<div class="layui-input-block">
+					<input type="text" name="name"
+						placeholder="请输入字典标识" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-inline">
+				<label class="layui-form-label">字典标题</label>
+				<div class="layui-input-block">
+					<input type="text" name="title"
+						placeholder="请输入字典标题" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+
+			<div class="layui-inline">
+				<button class="layui-btn layui-btn-sm fa fa-search" data-type="query">
+					 查询
+				</button>
+				<button class="layui-btn layui-btn-sm fa fa-undo" data-type="reset">
+					 重置
+				</button>
+			</div>
+		</div>
+	</div>
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+
+		<div class="layui-field-box layui-form">
+			<table id="dataList" lay-filter="dataList"
+				class="layui-hide layui-table">
+		</table>
+
+		</div>
+	</fieldset>
+	<!--数据列表结束-->
+	<div class="layui-footer" style="text-align: center;">©xx.com -	xx公司</div>
+	
+<!-- 	模板开始 -->
+	<script type="text/html" id="leftToolBtn">
+		{{showLeftToolBtn("dict-add","dict-delete")}} 
+	</script>
+	<script type="text/html" id="optBtn">
+		{{showOptBtn("dict-edit","dict-detail")}} 
+	</script>
+	
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript" th:inline="javascript">
+// 		var local = window.localStorage;
+		// 数据列表
+		layui.use(
+						[ 'form', 'table', 'layer' ],
+						function() {
+							var table = layui.table;window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var $ = layui.$;
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-200',
+								url : basePath+'/dict/getPageList', //数据接口
+// 								headers: {token: 'sasasas'},
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+// 								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+									limit : '10'
+								},
+								where : {},
+								limits : [ 10,50,100,500,1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								page : true, //开启分页
+								cols : [ [ //表头
+								{
+									type : 'checkbox',
+									width:'3%'
+								}, {
+									field : 'label',
+									title : '字典标识',
+									align: 'center',
+									width:'10%',
+									sort : true
+								}, {
+									field : 'title',
+									title : '字典标题',
+									align: 'center',
+									width:'10%',
+									sort : true
+								}, {
+									field : 'value',
+									title : '字典键值',
+									align: 'center',
+									width:'20%',
+									sort : true
+								} ,{
+									field : 'remark',
+									title : '备注',
+									align: 'center',
+									width:'10%',
+									sort : true
+								},  {
+									field : 'createTime',
+									title : '创建时间',
+									align: 'center',
+									width:'15%',
+									sort : true
+								}
+								,  {
+									field : 'updateTime',
+									title : '更新时间',
+									align: 'center',
+									width:'15%',
+									sort : true
+								}
+								,{
+									field: 'optBtn',
+									title: '操作',
+									align: 'center',
+									fixed:'right',
+									width:'15%',
+									toolbar: '#optBtn'
+								}
+								] ]
+							};
+							
+							//渲染菜单按钮
+							checkLeftToolBtn("dict-add","dict-delete",tableOptions);
+					    	checkOptBtn("dict-edit","dict-detail",tableOptions);
+							//渲染表格
+							table.render(tableOptions);
+
+						
+						//监听toolbar事件
+						table.on('toolbar(dataList)', function(data) {
+							if(data.event === 'dict-add'){
+								openWindow(data.event);
+							}
+							if(data.event === 'dict-delete'){
+								batchDelete(data.event,table);
+							}
+						});
+						
+						
+// 						监听操作栏tool事件
+						table.on('tool(dataList)', function(data) {
+							if(data.event === 'dict-edit' || data.event === 'dict-detail'){
+								openWindow(data.event,'id='+data.data.id);
+							}
+						});
+							
+						//查询和重置事件绑定
+						$(".fa-search,.fa-undo").on('click', function() {
+							var type = $(this).data('type');
+							var where = { 
+									  nickname: $("input[name='nickname']").val(),
+									  status: $("select[name='status']").val(),
+									  deptId: $("input[name='deptId']").val()
+								  };
+							active[type](table,where);
+						});
+							
+
+					});
+	</script>
+
+</body>
+
+</html>

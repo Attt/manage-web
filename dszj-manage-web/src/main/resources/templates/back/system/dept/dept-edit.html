@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+	<fieldset
+		class="layui-elem-field layui-field-title layui-card layui-card-body">
+		<div class="layui-form  layui-form-pane">
+			<form class="layui-form" action="">
+				<input type="hidden" name="id" th:if="${dept}" th:value="${dept.id}" />
+				<div class="layui-form-item">
+					<label class="layui-form-label required">部门名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="name" lay-verify="required"
+							lay-reqtext="部门名称不能为空" autocomplete="off" placeholder="请输入部门名称"
+							class="layui-input" th:value="${dept.name}">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">父级部门</label>
+					<div class="layui-input-block">
+						<input type="text" name="parentId" lay-verify="required"
+							lay-reqtext="父级部门不能为空" placeholder="父级部门" autocomplete="off"
+							class="layui-input" th:value="${dept.parentId}">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">排序数字</label>
+					<div class="layui-input-block">
+						<input type="text" name="orderNum" placeholder="请输入排序数字"
+							autocomplete="off" class="layui-input" th:value="${dept.orderNum}">
+					</div>
+				</div>
+
+				<div class="layui-form-item" pane="">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<textarea placeholder="请输入内容" name="remark" class="layui-textarea">[[${dept.remark}]]</textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn layui-btn-lg" lay-submit="" data-url="/dept/edit"
+							lay-filter="edit">提交</button>
+						<button type="button"  class="layui-btn layui-btn-lg layui-btn-primary back">返回</button>
+
+					</div>
+				</div>
+			</form>
+		</div>
+	</fieldset>
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript">
+		layui.use([ 'form', 'layer' ], function() {
+			var form = layui.form;
+			var layer = layui.layer;
+			var $ = layui.$;
+
+			form.on('submit(edit)', function(data) {
+				var index = layer.load(2);
+				$
+						.ajax({
+							type : "POST",
+							url : basePath+"/dept/edit",
+							data : JSON.stringify(data.field),
+							contentType : "application/json",
+							success : function(result) {
+								layer.close(index);
+								if (result.code == "0") {
+									layer.msg("提交成功");
+									var index = parent.layer
+											.getFrameIndex(window.name);
+									parent.layer.close(index);
+									window.parent.table.reload("dataList");
+									window.parent.refreshTreeData();
+								} else {
+									layer.msg(result.msg);
+								}
+							}
+						});
+
+				return false;
+			});
+
+		});
+	</script>
+</body>
+</html>

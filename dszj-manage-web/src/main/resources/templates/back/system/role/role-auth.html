@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:mo="https://gitee.com/aun/my">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+	<div>
+		<div id="dataTree"></div>
+	</div>
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript" th:inline="javascript">
+		// 树形菜单
+		layui.use(['tree'], function() {
+			var tree = layui.tree;
+			var layer = layui.layer;window.tree = tree;
+			var roleId = [[${roleId}]];window.roleId = roleId;
+
+			//树形菜单
+			$.ajax({
+				type : "GET",
+				url : basePath+"/menu/getMenuTree?roleId="+roleId,
+				dataType : 'json',
+				success : function(data) {
+					if (data.code === '0') {
+						tree.render({
+							elem : '#dataTree',
+							data : data.data,
+							showCheckbox : true, //是否显示复选框
+							onlyIconControl: true,
+							id : 'dataTreeId',
+							isJump : false ,//是否允许点击节点时弹出新窗口跳转
+							click : function(obj) {
+								var data = obj.data; //获取当前点击的节点数据
+							}
+						});
+					}else{
+						layer.msg(data.msg);
+					}
+				}
+			});
+
+		});
+	</script>
+</body>
+</html>

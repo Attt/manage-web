@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head
+	th:replace="back/common/template :: header(~{::title},~{::link},~{::style})">
+</head>
+<body>
+
+<!-- 	查询条件开始 -->
+	<div id="query" class="layui-form layui-card layui-card-body layui-form-pane "
+		style="margin-bottom: -15px; padding-bottom: 0px;">
+
+			<div class="layui-inline">
+				<label class="layui-form-label">标识</label>
+				<div class="layui-input-block">
+					<input type="text" name="name" th:value="${param.username}"
+						placeholder="请输入角色编号" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-inline">
+				<label class="layui-form-label">名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" th:value="${param.title}"
+						placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-inline">
+				<button class="layui-btn layui-btn-sm fa fa-search" data-type="query">
+					 查询
+				</button>
+				<button class="layui-btn layui-btn-sm fa fa-undo" data-type="reset">
+					 重置
+				</button>
+			</div>
+		</div>
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+
+		<div class="layui-field-box layui-form">
+			<table id="dataList" lay-filter="dataList"
+				class="layui-hide layui-table">
+			</table>
+		</div>
+	</fieldset>
+	
+<!-- 	模板开始 -->
+	<script type="text/html" id="leftToolBtn">
+		{{showLeftToolBtn("role-add","role-delete","role-auth")}} 
+	</script>
+	<script type="text/html" id="optBtn">
+		{{showOptBtn("role-edit","role-detail","role-user-list")}} 
+	</script>
+	
+<!-- 	模板结束 -->
+	
+	<script th:replace="back/common/template :: script"></script>
+	<script type="text/javascript" th:inline="javascript">
+		// 数据列表
+		layui.use(
+						[ 'form', 'table', 'layer' ],
+						function() {
+							var table = layui.table;window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var $ = layui.$;
+							//递归菜单树组装menuIds数组
+							var recursion = function(menuIds,checkedMenus){
+								$.each(checkedMenus, function(i,menu){
+									menuIds.push(menu.id);
+									if(menu.children.length > 0){
+										recursion(menuIds,menu.children);
+									}
+									
+								}); 
+							};
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-200',
+								url : basePath+'/role/getPageList', //数据接口
+// 								headers: {token: 'sasasas'},
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+// 								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+									limit : '10'
+								},
+								where : {},
+								limits : [ 10,50,100,500,1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								page : true, //开启分页
+								cols : [ [ //表头
+								{	
+									field : 'id',
+									type : 'checkbox',
+									width:'3%'
+								}, {
+									field : 'name',
+									title : '角色标识',
+									align: 'center',
+									width:'10%',
+									sort : true
+								}, {
+									field : 'title',
+									title : '角色名称',
+									align: 'center',
+									width:'10%',
+									sort : true
+								}, {
+									field : 'remark',
+									title : '备注',
+									align: 'center',
+									width:'10%',
+									sort : true
+								},{
+									field : 'createDate',
+									title : '创建时间',
+									align: 'center',
+									width:'17%',
+									sort : true
+								},{
+									field : 'updateDate',
+									title : '更新时间',
+									align: 'center',
+									width:'17%',
+									sort : true
+								}
+								,{
+									field: 'optBtn',
+									title: '操作',
+									align: 'center',
+									fixed:'right',
+									width:'20%',
+									toolbar: '#optBtn'
+								}
+								] ]
+							};
+							
+							//渲染菜单按钮
+							checkLeftToolBtn("role-add","role-delete","role-auth",tableOptions);
+					    	checkOptBtn("role-edit","role-detail",tableOptions);
+							//渲染表格
+							table.render(tableOptions);
+						
+						//监听toolbar事件
+						table.on('toolbar(dataList)', function(data) {
+							
+							if(data.event === 'role-add'){
+								openWindow(data.event);
+							}
+							if(data.event === 'role-delete'){
+								batchDelete(data.event,table);
+							}
+							
+							if(data.event === 'role-auth'){
+								var checkStatus = table.checkStatus('dataList');
+								var data = checkStatus.data;
+								
+								if (data == null || data.length == 0) {
+									layer.msg("请选择数据");
+									return;
+								}
+								
+								if (data.length > 1) {
+									layer.msg("只能选择一个角色进行授权");
+									return;
+								}
+				
+								window.layerIndex = layer.open({
+												type : 2,
+												title : '角色授权',
+												shadeClose : false,
+												maxmin : true,
+												area : [ '400px', '700px' ],
+												content : [ basePath+'/role/toAuth?roleId=' + data[0].id,'on' ],
+												btn : [ '提交', '返回'],
+												btnAlign : 'c',
+												yes: function(index, layero) {
+													
+													var index = layer.load(2);
+													
+													var childWin = window[layero.find('iframe')[0]['name']];
+													var checkedMenus = childWin.tree.getChecked('dataTreeId'); //获取选中节点的数据
+													var roleId = childWin.roleId; 
+													var menuIds = new Array();
+													recursion(menuIds,checkedMenus);
+													//保存授权数据
+													var data = {
+															"roleId" : roleId,	
+															"menuIds" : menuIds
+												   		 };
+													
+													$.ajax({
+														   type: "POST",
+														   url: basePath+"/role/auth",
+														   data:JSON.stringify(data), 
+														   contentType : "application/json",
+														   success: function(result){
+																layer.close(index);
+																if(result.code == "0") {
+																	 layer.msg("提交成功");
+														             layer.close(window.layerIndex);  
+// 																	 table.reload("dataList");
+																} else {
+																	layer.msg(result.msg);
+																}
+														   }
+													});
+													
+												},
+												btn2: function(index, layero) {
+													
+												},
+											});
+						}
+		
+					});
+
+			//监听操作栏tool事件
+			table.on('tool(dataList)', function(data) {
+				if(data.event === 'role-edit' || data.event === 'role-detail'|| data.event === 'role-user-list'){
+					openWindow(data.event,'id='+data.data.id);
+				}
+			});
+
+			
+			//查询和重置事件绑定
+			$(".fa-search,.fa-undo").on('click', function() {
+				var type = $(this).data('type');
+				var where = { 
+						username : $("input[name='username']").val(),
+						nickname : $("input[name='nickname']").val(),
+						status : $("select[name='status']").val(),
+						deptId : $("select[name='deptId']").val(),
+					  };
+				active[type](table,where);
+			});
+
+		});
+	</script>
+
+</body>
+
+</html>
