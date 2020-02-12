@@ -163,6 +163,7 @@ public class UserController extends BaseController {
 	public ResultVO resetPassword(@RequestParam("id") Integer id) {
 		User user = userService.findById(id);
 		user.setPassword(DigestUtils.md5Hex("000000"));
+		userService.update(user);
 		return success();
 	}
 

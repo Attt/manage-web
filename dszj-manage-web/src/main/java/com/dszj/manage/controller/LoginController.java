@@ -64,18 +64,18 @@ public class LoginController extends BaseController {
     @PublicAuth
 	@PostMapping(value = "/login")
 	@ResponseBody
-	public ResultVO login(String username, String password, String code,HttpServletRequest requst) {
+	public ResultVO login(String username, String password, String code,HttpServletRequest request) {
     	
-//    	if (!((String)requst.getSession().getAttribute(SessionKeyEnum.LOGIN_CODE.getCode())).equalsIgnoreCase(code)) {
-//    		throw new BizException(BizExceptionEnum.PARAM_ERROR,"验证码错误");
-//		}
+    	if (!((String)request.getSession().getAttribute(SessionKeyEnum.LOGIN_CODE.getCode())).equalsIgnoreCase(code)) {
+    		throw new BizException(BizExceptionEnum.PARAM_ERROR,"验证码错误");
+		}
     	
     	
 		User user = userService.findByUsernameAndPassword(username, DigestUtils.md5Hex(password.trim()));
 		if (user != null) {
 			UserInfo userInfo = BeanCopyUtil.convertBean(user, UserInfo.class);
 			userInfo.setRoles(roleService.findByUserId(user.getId()));
-			requst.getSession().setAttribute(SessionKeyEnum.ACCOUNT.getCode(), userInfo);
+			request.getSession().setAttribute(SessionKeyEnum.ACCOUNT.getCode(), userInfo);
 		}else{
 			throw new BizException(BizExceptionEnum.PARAM_ERROR,"用户名或密码错误");
 		}
@@ -100,7 +100,7 @@ public class LoginController extends BaseController {
 			}
 			
 		}
-		requst.getSession().setAttribute(SessionKeyEnum.AUTH.getCode(), urls);
+		request.getSession().setAttribute(SessionKeyEnum.AUTH.getCode(), urls);
 		
 		return success(labelMap);
 	}

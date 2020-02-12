@@ -41,10 +41,10 @@ public class Record {
     private String activityName;
 
     /**
-     * 学生id
+     * 用户id
      */
-    @Column(name = "student_id",columnDefinition = "int(10)")
-    private Integer studentId;
+    @Column(name = "member_id",columnDefinition = "int(10)")
+    private Integer memberId;
 
     /**
      * 创建时间

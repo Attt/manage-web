@@ -23,4 +23,11 @@ public class SystemProperties {
 	@Value("${system.open.auth}")
 	private boolean openAuth;
 
+	@Value("${weChat.web.appId}")
+	private String weChatWebAppId;
+	@Value("${weChat.web.appSecret}")
+	private String weChatWebAppSecret;
+	@Value("${weChat.web.token}")
+	private String weChatWebToken; //所有公众号共用token
+
 }

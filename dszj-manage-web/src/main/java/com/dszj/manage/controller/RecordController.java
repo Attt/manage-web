@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -22,7 +23,7 @@ public class RecordController extends BaseController {
     private RecordService recordService;
 
     @GetMapping("/toList")
-    private String toList(){
+    public String toList(){
         return "back/module/record/record-list";
     }
 
@@ -32,7 +33,7 @@ public class RecordController extends BaseController {
      */
     @GetMapping("/queryRecordPage")
     @ResponseBody
-    private ResultVO queryRecordPage(RecordPageForm form){
+    public ResultVO queryRecordPage(RecordPageForm form){
         Page<Record> recordPage = recordService.findPageList(form);
         ResultVO resultVO = new ResultVO(recordPage);
         resultVO.setPageNum(recordPage.getNumber());
@@ -41,6 +42,7 @@ public class RecordController extends BaseController {
         resultVO.setData(recordPage.getContent());
         return resultVO;
     }
+
 
 }
 

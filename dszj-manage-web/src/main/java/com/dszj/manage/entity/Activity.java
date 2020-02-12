@@ -53,6 +53,12 @@ public class Activity {
     private Date startTime;
 
     /**
+     * 创建人id
+     */
+    @Column(name = "creator_id",columnDefinition = "int(10)")
+    private Integer creatorId;
+
+    /**
      * 签到结束时间
      */
     @Column(name = "end_time")

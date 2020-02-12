@@ -10,9 +10,13 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author: zhangsy
@@ -20,7 +24,7 @@ import lombok.Data;
  * @Description:
  */
 @Entity
-@Table(name = "t_data")
+@Table(name = "t_member")
 @Data
 @DynamicInsert
 @DynamicUpdate
@@ -31,20 +35,41 @@ public class Member {
     @Column(name="id")
     private Integer id;
     /**
-     * 昵称
+     * 姓名
      */
     @Column(name="nickname",length=45)
-    private String nickname;
+    private String name;
+
+    /**
+     * 学生id
+     */
+    @Column(name = "student_id",columnDefinition = "int(10)")
+    private Integer studentId;
+
     /**
      * 头像
      */
-    @Column(name="headerpic",length=255)
+    @Column(name="header_pic")
     private String headerPic;
-    
-    @Column(name="pic_status",length=255)
-    private String picStatus;
-    
-    @Column(name="name_status",length=255)
-    private String nameStatus;
+
+    /**
+     * 微信openid
+     */
+    @Column(name = "open_id",length = 45)
+    private String openId;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    @CreatedDate
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @Column(name = "update_time")
+    @LastModifiedDate
+    private Date updateTime;
     
 }

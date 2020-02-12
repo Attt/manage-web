@@ -5,5 +5,6 @@ import com.dszj.manage.base.BaseDao;
 import com.dszj.manage.entity.Record;
 
 public interface  RecordDao extends BaseDao<Record> {
+    Record findByActivityIdAndMemberId(Integer activityId,Integer memberId);
 
 }
