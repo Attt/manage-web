@@ -2,8 +2,11 @@ package com.dszj.manage.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.dszj.manage.auth.SessionKeyEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,8 +45,10 @@ import com.dszj.manage.service.UserService;
  */
 @Controller
 @RequestMapping("/user")
+@Slf4j
 @SuppressWarnings("rawtypes")
 public class UserController extends BaseController {
+
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -153,7 +158,12 @@ public class UserController extends BaseController {
 	
 	@GetMapping("/delete")
 	@ResponseBody
-	public ResultVO delete(@RequestParam("ids") List<Integer> ids) {
+	public ResultVO delete(@RequestParam("ids") List<Integer> ids, HttpServletRequest request) {
+		UserInfo userInfo = (UserInfo) request.getSession().getAttribute(SessionKeyEnum.ACCOUNT.getCode());
+		if(userInfo == null || ids.contains(userInfo.getId())){
+			log.warn("不能删除自己");
+			throw new BizException(BizExceptionEnum.SYS_ERROR);
+		}
 		userService.deleteByIdIn(ids);
 		return success();
 	}
