@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="back/common/template :: header(~{::title},~{::link},~{::style})"> </head>
+<body>
+
+<!-- 	查询条件开始 -->
+
+   <!-- 	查询条件结束 -->
+
+	<!--数据列表开始-->
+	<fieldset class="layui-elem-field">
+		<div class="layui-field-box layui-form">
+				<table id="dataList"  lay-filter="dataList"
+					class="layui-hide layui-table">
+				</table>
+		</div>
+	</fieldset>
+	
+<!-- 	模板开始 -->
+<script type="text/html" id="leftToolBtn">
+	{{showLeftToolBtn("student-add","student-import")}}
+</script>
+<script type="text/html" id="optBtn">
+	{{showOptBtn("student-edit","student-code")}}
+</script>
+<!-- 	模板结束 -->
+	
+	<script th:replace="back/common/template :: script"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		// 数据列表
+		layui.use([ 'form', 'table', 'layer'],
+						function() {
+							var table = layui.table;
+							window.table = table;
+							var form = layui.form;
+							var layer = layui.layer;
+							var $ = layui.$;
+							
+							
+							//第一个实例
+							var tableOptions = {
+								elem : '#dataList',
+								toolbar: '#leftToolBtn',
+								defaultToolbar:['filter', 'exports', 'print'],
+								height : 'full-200',
+								url : basePath+'/activity/queryActivityPage', //数据接口
+								even : true,
+								cellMinWidth : 20, //全局定义常规单元格的最小宽度
+								size: 'lg',
+								method : 'get',
+								request : {
+									pageName : 'pageNum', //页码的参数名称，默认：page
+									limitName : 'pageSize', //每页数据量的参数名，默认：limit
+									limit : '10'
+								},
+								where : {},
+								limits : [10,50,100,500,1000],
+								response : {
+									statusName : 'code', //数据状态的字段名称，默认：code
+									statusCode : "0", //成功的状态码，默认：0
+									msgName : 'msg', //状态信息的字段名称，默认：msg
+									countName : 'total', //数据总数的字段名称，默认：count
+									dataName : 'data' //数据列表的字段名称，默认：data
+								},
+								done :function(res, curr, count){
+								  },
+								page : true, //开启分页
+								cols : [[ //表头
+											{
+												field : 'studentNo',
+												title : '学生编号',
+												align: 'center',
+												width:'10%'
+											}, 
+											{
+												field : 'studentName',
+												title : '学生姓名',
+												align: 'center',
+												width:'30%'
+											},
+											{
+												field : 'gender',
+												title : '学生性别',
+												align: 'center',
+												width:'15%'
+											},
+											{
+												field : 'classNo',
+												title : '班级编号',
+												align: 'center',
+												width:'15%'
+											},
+									        {
+									        	field : 'className',
+											    title : '班级名称',
+											    align : 'center',
+											    width : '15%'
+											},
+											{
+												field: 'optBtn',
+												title: '操作',
+												align: 'center',
+												//fixed:'right',
+												//width:'15%',
+												toolbar: '#optBtn'
+											}
+										] ]
+							};
+							checkLeftToolBtn("student-add","student-import",tableOptions);
+							checkOptBtn("student-edit","activity-code",tableOptions);
+					    	//渲染表格
+							table.render(tableOptions);
+							table.on('toolbar(dataList)', function(data) {
+								if (data.event === 'activity-add') {
+									openWindow(data.event);
+								}
+							});
+							//监听操作栏tool事件
+							table.on('tool(dataList)', function(data) {
+								if(data.event === 'activity-edit' || data.event === 'activity-code'){
+									openWindow(data.event,'id='+data.data.id);
+								}
+							});
+
+				});
+	</script>
+</body>
+
+</html>
